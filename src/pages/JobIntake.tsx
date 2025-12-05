@@ -5,23 +5,25 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { useCreateJob } from "@/hooks/useJobs";
 
 export default function JobIntake() {
   const { toast } = useToast();
+  const createJob = useCreateJob();
   const [formData, setFormData] = useState({
     title: "",
-    department: "",
+    description: "",
     location: "",
-    type: "Full-time",
-    salaryMin: "",
-    salaryMax: "",
+    experienceLevel: "mid",
   });
   const [requirements, setRequirements] = useState<string[]>([]);
   const [responsibilities, setResponsibilities] = useState<string[]>([]);
   const [newRequirement, setNewRequirement] = useState("");
   const [newResponsibility, setNewResponsibility] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const addItem = (list: string[], setList: (items: string[]) => void, item: string, setItem: (val: string) => void) => {
     if (item && !list.includes(item)) {
@@ -34,13 +36,67 @@ export default function JobIntake() {
     setList(list.filter(item => item !== itemToRemove));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Submitting job:", { ...formData, requirements, responsibilities });
-    toast({
-      title: "Job Posted",
-      description: `${formData.title} has been added to open positions.`,
-    });
+    
+    if (!formData.title || !formData.description) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields (Title, Description).",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (requirements.length === 0) {
+      toast({
+        title: "Validation Error",
+        description: "Please add at least one required skill.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    try {
+      // Combine description and responsibilities into a full description
+      const fullDescription = formData.description + 
+        (responsibilities.length > 0 
+          ? "\n\nResponsibilities:\n" + responsibilities.map((r, i) => `${i + 1}. ${r}`).join("\n")
+          : "");
+
+      await createJob({
+        title: formData.title,
+        description: fullDescription,
+        requiredSkills: requirements,
+        experienceLevel: formData.experienceLevel,
+        location: formData.location || "Remote",
+      });
+
+      toast({
+        title: "Job Posted",
+        description: `${formData.title} has been added to open positions.`,
+      });
+
+      // Reset form
+      setFormData({
+        title: "",
+        description: "",
+        location: "",
+        experienceLevel: "mid",
+      });
+      setRequirements([]);
+      setResponsibilities([]);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to post job. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -77,28 +133,16 @@ export default function JobIntake() {
               Job Details
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <Label htmlFor="title" className="text-xs">Job Title</Label>
+              <div className="space-y-1 md:col-span-2">
+                <Label htmlFor="title" className="text-xs">Job Title *</Label>
                 <Input
                   id="title"
-                  placeholder="senior_frontend_dev"
+                  placeholder="Senior Frontend Developer"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   className="bg-secondary border-border text-xs font-mono"
+                  required
                 />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="department" className="text-xs">Department</Label>
-                <div className="relative">
-                  <Building2 className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground" />
-                  <Input
-                    id="department"
-                    placeholder="engineering"
-                    value={formData.department}
-                    onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                    className="bg-secondary border-border text-xs font-mono pl-7"
-                  />
-                </div>
               </div>
               <div className="space-y-1">
                 <Label htmlFor="location" className="text-xs">Location</Label>
@@ -106,7 +150,7 @@ export default function JobIntake() {
                   <MapPin className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground" />
                   <Input
                     id="location"
-                    placeholder="remote"
+                    placeholder="Remote, New York, etc."
                     value={formData.location}
                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                     className="bg-secondary border-border text-xs font-mono pl-7"
@@ -114,55 +158,42 @@ export default function JobIntake() {
                 </div>
               </div>
               <div className="space-y-1">
-                <Label htmlFor="type" className="text-xs">Type</Label>
+                <Label htmlFor="experienceLevel" className="text-xs">Experience Level</Label>
                 <select
-                  id="type"
-                  value={formData.type}
-                  onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                  id="experienceLevel"
+                  value={formData.experienceLevel}
+                  onChange={(e) => setFormData({ ...formData, experienceLevel: e.target.value })}
                   className="w-full h-9 bg-secondary border border-border px-2 text-xs font-mono text-foreground focus:outline-none"
                 >
-                  <option>Full-time</option>
-                  <option>Part-time</option>
-                  <option>Contract</option>
-                  <option>Freelance</option>
+                  <option value="entry">Entry Level</option>
+                  <option value="mid">Mid Level</option>
+                  <option value="senior">Senior</option>
+                  <option value="executive">Executive</option>
                 </select>
               </div>
             </div>
 
-            {/* Salary Range */}
+            {/* Description */}
             <div className="mt-4">
-              <Label className="text-xs">Salary Range</Label>
-              <div className="flex items-center gap-3 mt-1">
-                <div className="relative flex-1">
-                  <DollarSign className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground" />
-                  <Input
-                    placeholder="120000"
-                    value={formData.salaryMin}
-                    onChange={(e) => setFormData({ ...formData, salaryMin: e.target.value })}
-                    className="bg-secondary border-border text-xs font-mono pl-7"
-                  />
-                </div>
-                <span className="text-xs text-muted-foreground">to</span>
-                <div className="relative flex-1">
-                  <DollarSign className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground" />
-                  <Input
-                    placeholder="160000"
-                    value={formData.salaryMax}
-                    onChange={(e) => setFormData({ ...formData, salaryMax: e.target.value })}
-                    className="bg-secondary border-border text-xs font-mono pl-7"
-                  />
-                </div>
-              </div>
+              <Label htmlFor="description" className="text-xs">Job Description *</Label>
+              <Textarea
+                id="description"
+                placeholder="Describe the role, responsibilities, and what you're looking for..."
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                className="bg-secondary border-border text-xs font-mono min-h-[120px] resize-none mt-1"
+                required
+              />
             </div>
           </GlassCard>
 
-          {/* Requirements */}
+          {/* Requirements (Skills) */}
           <GlassCard
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
           >
-            <h2 className="text-sm font-semibold text-foreground mb-4">Requirements</h2>
+            <h2 className="text-sm font-semibold text-foreground mb-4">Required Skills *</h2>
             
             <div className="space-y-2 mb-3">
               {requirements.map((req, index) => (
@@ -261,9 +292,9 @@ export default function JobIntake() {
             <Button type="button" variant="outline">
               Save Draft
             </Button>
-            <Button type="submit">
+            <Button type="submit" disabled={isSubmitting}>
               <Save className="w-3 h-3 mr-2" />
-              Post Job
+              {isSubmitting ? "Posting..." : "Post Job"}
             </Button>
           </div>
         </form>

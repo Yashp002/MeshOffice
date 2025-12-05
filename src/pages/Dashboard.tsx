@@ -7,19 +7,32 @@ import {
   TrendingUp, 
   AlertTriangle,
   Lightbulb,
-  ArrowRight
+  ArrowRight,
+  Users,
+  Briefcase,
+  Zap
 } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { StatCard } from "@/components/ui/StatCard";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/button";
-import { mockAIInsights, mockSpendData, mockTasks, mockPods } from "@/data/mockData";
+import { useJobs } from "@/hooks/useJobs";
+import { useCandidates } from "@/hooks/useCandidates";
 import { cn } from "@/lib/utils";
 
 export default function Dashboard() {
-  const activeTasks = mockTasks.filter(t => t.status === "in-progress").length;
-  const activePods = mockPods.filter(p => p.status === "active").length;
-  const totalSpend = mockSpendData.reduce((acc, d) => acc + d.spend, 0);
+  const jobs = useJobs();
+  const candidates = useCandidates();
+  
+  const jobsCount = jobs?.length || 0;
+  const candidatesCount = candidates?.length || 0;
+  // Estimate matches - in a real app, you'd have a query for total match count
+  const totalMatches = 0; // This would come from a summary query in a real implementation
+  
+  // Calculate recent activity (items created in last 7 days)
+  const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  const recentJobs = jobs?.filter(job => job._creationTime > sevenDaysAgo).length || 0;
+  const recentCandidates = candidates?.filter(c => c._creationTime > sevenDaysAgo).length || 0;
 
   return (
     <AppLayout>
@@ -52,35 +65,37 @@ export default function Dashboard() {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard 
-            title="Open Requests" 
-            value="24" 
-            change="+3 this week" 
-            changeType="neutral"
-            icon={FileText}
+            title="Total Jobs" 
+            value={jobsCount.toString()} 
+            change={recentJobs > 0 ? `+${recentJobs} this week` : "No new jobs"} 
+            changeType={recentJobs > 0 ? "positive" : "neutral"}
+            icon={Briefcase}
             delay={0.1}
           />
           <StatCard 
-            title="Active Tasks" 
-            value={activeTasks} 
-            change="2 due today" 
-            changeType="neutral"
-            icon={CheckCircle2}
+            title="Total Candidates" 
+            value={candidatesCount.toString()} 
+            change={recentCandidates > 0 ? `+${recentCandidates} this week` : "No new candidates"} 
+            changeType={recentCandidates > 0 ? "positive" : "neutral"}
+            icon={Users}
             delay={0.15}
           />
           <StatCard 
-            title="Active Pods" 
-            value={activePods} 
-            change="1 new this month" 
-            changeType="positive"
-            icon={Boxes}
+            title="System Status" 
+            value={jobsCount > 0 && candidatesCount > 0 ? "Ready" : "Setup"} 
+            change={jobsCount > 0 && candidatesCount > 0 ? "Ready to match" : "Add data first"} 
+            changeType={jobsCount > 0 && candidatesCount > 0 ? "positive" : "neutral"}
+            icon={Zap}
             delay={0.2}
           />
           <StatCard 
-            title="Monthly Spend" 
-            value={`$${(totalSpend / 1000).toFixed(1)}k`} 
-            change="-8% vs last month" 
-            changeType="positive"
-            icon={DollarSign}
+            title="Match Potential" 
+            value={jobsCount > 0 && candidatesCount > 0 
+              ? `${jobsCount * candidatesCount}` 
+              : "0"} 
+            change="Possible matches" 
+            changeType="neutral"
+            icon={CheckCircle2}
             delay={0.25}
           />
         </div>
@@ -103,36 +118,74 @@ export default function Dashboard() {
               </Button>
             </div>
             <div className="space-y-3">
-              {mockAIInsights.map((insight, index) => (
+              {jobsCount === 0 && (
                 <motion.div
-                  key={insight.id}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ delay: 0.4 + index * 0.1 }}
-                  className={cn(
-                    "p-3 border transition-all duration-150 hover:border-muted-foreground/30",
-                    insight.priority === "high" 
-                      ? "border-destructive/30 bg-destructive/5" 
-                      : insight.priority === "medium"
-                      ? "border-warning/30 bg-warning/5"
-                      : "border-border bg-secondary/30"
-                  )}
+                  className="p-3 border border-warning/30 bg-warning/5"
                 >
                   <div className="flex items-start gap-3">
-                    {insight.priority === "high" ? (
-                      <AlertTriangle className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
-                    ) : insight.priority === "medium" ? (
-                      <TrendingUp className="w-4 h-4 text-warning shrink-0 mt-0.5" />
-                    ) : (
-                      <Lightbulb className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
-                    )}
+                    <AlertTriangle className="w-4 h-4 text-warning shrink-0 mt-0.5" />
                     <div>
-                      <h3 className="text-xs font-semibold text-foreground">{insight.title}</h3>
-                      <p className="text-xs text-muted-foreground mt-1">{insight.description}</p>
+                      <h3 className="text-xs font-semibold text-foreground">No Jobs Yet</h3>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Create your first job posting to start matching candidates.
+                      </p>
                     </div>
                   </div>
                 </motion.div>
-              ))}
+              )}
+              {candidatesCount === 0 && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="p-3 border border-warning/30 bg-warning/5"
+                >
+                  <div className="flex items-start gap-3">
+                    <AlertTriangle className="w-4 h-4 text-warning shrink-0 mt-0.5" />
+                    <div>
+                      <h3 className="text-xs font-semibold text-foreground">No Candidates Yet</h3>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Add candidates to enable AI-powered matching.
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+              {jobsCount > 0 && candidatesCount > 0 && totalMatches === 0 && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="p-3 border border-border bg-secondary/30"
+                >
+                  <div className="flex items-start gap-3">
+                    <Lightbulb className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
+                    <div>
+                      <h3 className="text-xs font-semibold text-foreground">Ready to Match</h3>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Go to the Matching Engine to generate candidate matches for your jobs.
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+              {jobsCount > 0 && candidatesCount > 0 && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="p-3 border border-border bg-secondary/30"
+                >
+                  <div className="flex items-start gap-3">
+                    <TrendingUp className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
+                    <div>
+                      <h3 className="text-xs font-semibold text-foreground">Ready to Match</h3>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        You have {jobsCount} job{jobsCount !== 1 ? 's' : ''} and {candidatesCount} candidate{candidatesCount !== 1 ? 's' : ''}. Start matching in the Matching Engine.
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
             </div>
           </GlassCard>
 
@@ -144,68 +197,88 @@ export default function Dashboard() {
           >
             <h2 className="text-sm font-semibold text-foreground mb-4">Quick Actions</h2>
             <div className="space-y-2">
-              <Button variant="glass" className="w-full justify-start text-xs">
-                <FileText className="w-3 h-3 mr-2" />
+              <Button 
+                variant="glass" 
+                className="w-full justify-start text-xs"
+                onClick={() => window.location.href = '/candidates'}
+              >
+                <Users className="w-3 h-3 mr-2" />
                 Add New Candidate
               </Button>
-              <Button variant="glass" className="w-full justify-start text-xs">
-                <Boxes className="w-3 h-3 mr-2" />
-                Create New Pod
+              <Button 
+                variant="glass" 
+                className="w-full justify-start text-xs"
+                onClick={() => window.location.href = '/jobs'}
+              >
+                <Briefcase className="w-3 h-3 mr-2" />
+                Create New Job
               </Button>
-              <Button variant="glass" className="w-full justify-start text-xs">
-                <CheckCircle2 className="w-3 h-3 mr-2" />
-                Review Pending Tasks
+              <Button 
+                variant="glass" 
+                className="w-full justify-start text-xs"
+                onClick={() => window.location.href = '/matching'}
+              >
+                <Zap className="w-3 h-3 mr-2" />
+                Run Matching
               </Button>
             </div>
           </GlassCard>
         </div>
 
-        {/* Spend Chart */}
+        {/* Recent Activity */}
         <GlassCard
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
         >
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-foreground">Monthly Spend</h2>
-            <select className="bg-secondary border border-border px-2 py-1 text-xs text-foreground focus:outline-none">
-              <option>Last 6 months</option>
-              <option>Last year</option>
-              <option>All time</option>
-            </select>
+            <h2 className="text-sm font-semibold text-foreground">Recent Activity</h2>
           </div>
-          <div className="h-48 flex items-end gap-3">
-            {mockSpendData.map((data, index) => (
+          <div className="space-y-3">
+            {jobs && jobs.slice(0, 5).map((job, index) => (
               <motion.div
-                key={data.month}
-                initial={{ height: 0 }}
-                animate={{ height: `${(data.spend / 18000) * 100}%` }}
-                transition={{ delay: 0.5 + index * 0.1, duration: 0.4 }}
-                className="flex-1 flex flex-col items-center gap-2"
+                key={job._id}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 + index * 0.1 }}
+                className="p-3 border border-border bg-secondary/30"
               >
-                <div className="w-full relative">
-                  <div 
-                    className="w-full bg-foreground/20 hover:bg-foreground/30 transition-colors"
-                    style={{ height: `${(data.spend / 18000) * 160}px` }}
-                  />
-                  <div 
-                    className="absolute bottom-0 w-full border-t border-dashed border-muted-foreground/30"
-                    style={{ top: `${160 - (data.budget / 18000) * 160}px` }}
-                  />
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <Briefcase className="w-3 h-3 text-muted-foreground" />
+                      <h3 className="text-xs font-semibold text-foreground font-mono">{job.title}</h3>
+                    </div>
+                    <p className="text-[10px] text-muted-foreground font-mono mt-1">
+                      {job.location} • {job.experienceLevel}
+                    </p>
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {job.requiredSkills.slice(0, 3).map((skill: string) => (
+                        <span
+                          key={skill}
+                          className="text-[9px] font-mono border border-border px-1.5 py-0.5 text-muted-foreground"
+                        >
+                          {skill}
+                        </span>
+                      ))}
+                      {job.requiredSkills.length > 3 && (
+                        <span className="text-[9px] font-mono text-muted-foreground">
+                          +{job.requiredSkills.length - 3}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <span className="text-[10px] text-muted-foreground font-mono">
+                    {new Date(job._creationTime).toLocaleDateString()}
+                  </span>
                 </div>
-                <span className="text-[10px] text-muted-foreground font-mono">{data.month}</span>
               </motion.div>
             ))}
-          </div>
-          <div className="flex items-center gap-6 mt-4 pt-3 border-t border-border">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-foreground/20" />
-              <span className="text-[10px] text-muted-foreground">Actual Spend</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-0 border-t border-dashed border-muted-foreground/50" />
-              <span className="text-[10px] text-muted-foreground">Budget</span>
-            </div>
+            {(!jobs || jobs.length === 0) && (
+              <div className="text-xs text-muted-foreground font-mono p-4 text-center">
+                No recent activity
+              </div>
+            )}
           </div>
         </GlassCard>
       </div>

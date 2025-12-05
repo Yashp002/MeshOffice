@@ -8,7 +8,7 @@ interface AppLayoutProps {
 
 export function AppLayout({ children }: AppLayoutProps) {
   return (
-    <div className="flex min-h-screen w-full bg-background bg-mesh-gradient">
+    <div className="flex min-h-screen w-full bg-background">
       <AppSidebar />
       <main className="flex-1 overflow-auto">
         <motion.div
