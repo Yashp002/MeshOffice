@@ -61,16 +61,29 @@ export const matchCandidates = action({
 });
 
 export const getJobMatches = query({
-  args: { jobId: v.id("jobs") },
+  args: { jobId: v.optional(v.id("jobs")) },
   handler: async (ctx, args) => {
+    // Return empty array if no jobId is provided
+    const jobId = args.jobId;
+    if (!jobId) {
+      return [];
+    }
+
+    const MINIMUM_MATCH_SCORE = 40; // Only show matches with 40% or higher score
+
     const matches = await ctx.db
       .query("matches")
-      .withIndex("by_job_score", (q) => q.eq("jobId", args.jobId))
+      .withIndex("by_job_score", (q) => q.eq("jobId", jobId))
       .order("desc")
       .collect();
 
     const enrichedMatches = [];
     for (const match of matches) {
+      // Filter out matches below minimum threshold
+      if (match.score < MINIMUM_MATCH_SCORE) {
+        continue;
+      }
+
       const candidate = await ctx.db.get(match.candidateId);
       if (candidate) {
         enrichedMatches.push({

@@ -12,6 +12,9 @@ import {
   Terminal,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useQuery } from "convex/react";
+import { api } from "../../../convex/_generated/api";
+import { useAuthActions } from "@convex-dev/auth/react";
 
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
@@ -22,6 +25,39 @@ const navItems = [
   { icon: Network, label: "Work Graph", path: "/work-graph" },
   { icon: Settings, label: "Settings", path: "/settings" },
 ];
+
+function UserSection() {
+  const loggedInUser = useQuery(api.auth.loggedInUser);
+  const { signOut } = useAuthActions();
+
+  const userInitials = loggedInUser?.email
+    ? loggedInUser.email.substring(0, 2).toUpperCase()
+    : "U";
+  const userName = loggedInUser?.email?.split("@")[0] || "user";
+
+  return (
+    <div className="retro-card p-3">
+      <div className="flex items-center gap-2">
+        <div className="w-7 h-7 border border-border flex items-center justify-center">
+          <span className="text-[10px] font-mono text-foreground">{userInitials}</span>
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-mono text-foreground truncate">{userName}</p>
+          <p className="text-[10px] text-muted-foreground truncate">
+            {loggedInUser?.email || "user"}
+          </p>
+        </div>
+        <button
+          onClick={() => void signOut()}
+          className="p-1.5 hover:bg-secondary transition-colors"
+          title="Sign out"
+        >
+          <LogOut className="w-3 h-3 text-muted-foreground" />
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export function AppSidebar() {
   const location = useLocation();
@@ -73,20 +109,7 @@ export function AppSidebar() {
 
       {/* User Section */}
       <div className="p-3 border-t border-sidebar-border">
-        <div className="retro-card p-3">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 border border-border flex items-center justify-center">
-              <span className="text-[10px] font-mono text-foreground">JD</span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-mono text-foreground truncate">john_doe</p>
-              <p className="text-[10px] text-muted-foreground truncate">admin</p>
-            </div>
-            <button className="p-1.5 hover:bg-secondary transition-colors">
-              <LogOut className="w-3 h-3 text-muted-foreground" />
-            </button>
-          </div>
-        </div>
+        <UserSection />
       </div>
     </aside>
   );

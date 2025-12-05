@@ -8,6 +8,7 @@ export function useMatchCandidates() {
 
 export function useJobMatches(jobId: Id<"jobs"> | null | undefined) {
   // Pass undefined to skip the query when jobId is null/undefined
+  // The query now accepts optional jobId, so it can handle empty calls gracefully
   return useQuery(
     api.matching.getJobMatches,
     jobId ? { jobId } : undefined
