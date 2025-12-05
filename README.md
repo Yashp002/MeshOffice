@@ -1,73 +1,204 @@
-# Welcome to your Lovable project
+# 🌐 MeshOffice — AI-Native Work Orchestration OS  
+**Autonomous Workflows • AI-Managed Pods • Deep Talent Intelligence • Hiring & Execution in One Place**
 
-## Project info
+MeshOffice is an AI-native platform that replaces traditional job boards, freelancing sites, and project management tools with a **single intelligent operating system** that understands work, finds the right people, breaks work into tasks, and manages the entire execution autonomously.
 
-**URL**: https://lovable.dev/projects/71a39fa7-3ba1-49dc-95d8-1568b1967dc6
+It combines:
+- AI workflow orchestration  
+- Autonomous team assembly  
+- Talent intelligence  
+- Hiring automation  
+- Real-time project tracking  
+- A two-way marketplace for workers & employers  
+- A unified user profile system  
+- A dedicated LLM-powered backend (“MO Brain”)  
 
-## How can I edit this code?
+MeshOffice is built using **React, TypeScript, Vite, Tailwind, shadcn-ui**, and integrates with **Supabase** for database, auth, and backend functions.
 
-There are several ways of editing your application.
+---
 
-**Use Lovable**
+## 🚀 What is MeshOffice?
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/71a39fa7-3ba1-49dc-95d8-1568b1967dc6) and start prompting.
+MeshOffice is an **AI-first Work OS** that lets users say:
 
-Changes made via Lovable will be committed automatically to this repo.
+> “MO, I need this done in X time with Y budget.”
 
-**Use your preferred IDE**
+And MO automatically:
+1. Understands the request  
+2. Breaks it into tasks  
+3. Assembles the right team (freelancers or full-time candidates)  
+4. Assigns work  
+5. Tracks progress  
+6. Validates deliverables  
+7. Sends the user only the final output  
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+On the other side, workers can join pods, get tasks assigned by AI, and get paid once their work is validated.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+---
 
-Follow these steps:
+## 🧠 Core Features
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
+### **1. Natural-Language Workflows**
+Users describe work like texting a human.  
+MO interprets, plans, decomposes, and executes.
+
+### **2. AI-Assembled Pods (Teams)**
+MO selects talent based on:
+- skills  
+- experience  
+- pricing  
+- availability  
+- embeddings  
+- performance history  
+
+### **3. Automatic Task Decomposition**
+Large projects → structured task graph  
+Tasks → milestones → dependencies → owners
+
+### **4. Autonomous Work Execution**
+MO manages the entire lifecycle:
+- task assignment  
+- deadline tracking  
+- progress monitoring  
+- resolving blockers  
+- quality control  
+
+### **5. Real-Time WorkGraph Dashboard**
+Visual tracking of:
+- budget  
+- timeline  
+- task progress  
+- risks & blockers  
+- candidate contributions  
+
+### **6. Two-Way Marketplace**
+One unified profile allows users to:
+- **hire**  
+- **work**  
+- **switch roles dynamically**  
+
+### **7. Deep Candidate Intelligence**
+MO builds an internal capability graph by analyzing:
+- resumes  
+- informal conversational inputs  
+- previous work  
+- pricing patterns  
+- behavioral signals  
+
+### **8. AI Hiring Assistant**
+For full-time roles, MO handles:
+- job description generation  
+- candidate discovery  
+- screening & ranking  
+- shortlisting  
+- interview question generation  
+
+### **9. End-to-End Freelance Workflow Automation**
+MO handles:
+- contracts  
+- task breakdown  
+- deliverable validation  
+- only leaving **payment approval** to the user
+
+### **10. MO Brain — Dedicated LLM Backend**
+Custom chain-of-thought architecture powers:
+- work planning  
+- talent matching  
+- candidate embeddings  
+- multi-step reasoning  
+- decision making  
+
+---
+
+## 🏗 Tech Stack
+
+### **Frontend**
+- Vite  
+- React  
+- TypeScript  
+- Tailwind CSS  
+- shadcn/ui  
+- Lucide Icons  
+
+### **Backend**
+- Supabase (Postgres, Auth, Storage)  
+- Custom Node/Express API  
+- OpenAI / Claude LLMs  
+- Task engines & matchers  
+
+---
+
+## 📦 Project Setup
+
+Clone and install:
+
+```bash
 git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
+cd meshoffice
 npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Runs at:
+```
+http://localhost:5173
+```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+---
 
-**Use GitHub Codespaces**
+## 🌐 Deploying & Domains
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+You can deploy directly from **Lovable**:  
+→ Project → Share → Publish
 
-## What technologies are used for this project?
+For custom domains:  
+→ Settings → Domains → Connect
 
-This project is built with:
+---
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 🧩 Current Supabase Schema
 
-## How can I deploy this project?
+MeshOffice uses 10 core tables:
 
-Simply open [Lovable](https://lovable.dev/projects/71a39fa7-3ba1-49dc-95d8-1568b1967dc6) and click on Share -> Publish.
+- `users`  
+- `requests`  
+- `pods`  
+- `tasks`  
+- `task_assignments`  
+- `deliverables`  
+- `candidates`  
+- `candidate_profiles`  
+- `candidate_matches`  
+- `jd_profiles`  
 
-## Can I connect a custom domain to my Lovable project?
+These power the entire WorkGraph and candidate intelligence engine.
 
-Yes, you can!
+---
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## 🎯 Mission
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+To replace outdated job boards, rigid corporate workflows, and chaotic freelancer marketplaces with a **single AI that understands work and executes it end-to-end**.
+
+MeshOffice is the first step toward an AI-native labor operating system.
+
+---
+
+## 🛠 Status
+MVP in development.  
+Core backend logic and Supabase schema operational.  
+Frontend scaffolding active through React + Lovable.  
+
+---
+
+## 🤝 Contributing
+Open to collaborators, engineers, and AI researchers.  
+Fork the repo → open PRs → build the future of work.
+
+---
+
+## 📬 Contact
+For collaboration or access:
+**contact: (your email/link here)**
+
+---
+
