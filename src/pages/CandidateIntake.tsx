@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { User, Mail, Briefcase, FileText, X, Plus, Save } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { GlassCard } from "@/components/ui/GlassCard";
@@ -9,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { useCreateCandidate } from "@/hooks/useCandidates";
 
 const suggestedSkills = [
   "React", "TypeScript", "Node.js", "Python", "AWS", "Docker", 
@@ -17,15 +19,19 @@ const suggestedSkills = [
 
 export default function CandidateIntake() {
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const createCandidate = useCreateCandidate();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     title: "",
     experience: "",
     resume: "",
+    location: "",
   });
   const [skills, setSkills] = useState<string[]>([]);
   const [newSkill, setNewSkill] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const addSkill = (skill: string) => {
     if (skill && !skills.includes(skill)) {
@@ -38,13 +44,57 @@ export default function CandidateIntake() {
     setSkills(skills.filter(skill => skill !== skillToRemove));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Submitting candidate:", { ...formData, skills });
-    toast({
-      title: "Candidate Added",
-      description: `${formData.name} has been added to the system.`,
-    });
+    
+    if (!formData.name || !formData.email || !formData.resume) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields (Name, Email, Resume).",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    try {
+      await createCandidate({
+        name: formData.name,
+        email: formData.email,
+        resumeText: formData.resume,
+        skills: skills,
+        experienceYears: parseInt(formData.experience) || 0,
+        location: formData.location || "Not specified",
+      });
+
+      toast({
+        title: "Candidate Added",
+        description: `${formData.name} has been added to the system.`,
+      });
+
+      // Reset form
+      setFormData({
+        name: "",
+        email: "",
+        title: "",
+        experience: "",
+        resume: "",
+        location: "",
+      });
+      setSkills([]);
+      
+      // Optionally navigate to candidates list
+      // navigate("/candidates");
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to add candidate. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -122,9 +172,20 @@ export default function CandidateIntake() {
                 <Label htmlFor="experience" className="text-xs">Years of Experience</Label>
                 <Input
                   id="experience"
+                  type="number"
                   placeholder="5"
                   value={formData.experience}
                   onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
+                  className="bg-secondary border-border text-xs font-mono"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="location" className="text-xs">Location</Label>
+                <Input
+                  id="location"
+                  placeholder="Remote, New York, etc."
+                  value={formData.location}
+                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                   className="bg-secondary border-border text-xs font-mono"
                 />
               </div>
@@ -236,9 +297,9 @@ export default function CandidateIntake() {
             <Button type="button" variant="outline">
               Cancel
             </Button>
-            <Button type="submit">
+            <Button type="submit" disabled={isSubmitting}>
               <Save className="w-3 h-3 mr-2" />
-              Save Candidate
+              {isSubmitting ? "Saving..." : "Save Candidate"}
             </Button>
           </div>
         </form>

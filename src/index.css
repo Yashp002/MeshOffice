@@ -76,23 +76,30 @@
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
-
   html {
     @apply dark;
   }
 
   body {
-    @apply bg-background text-foreground font-mono antialiased;
+    @apply font-mono antialiased;
     font-family: 'IBM Plex Mono', 'Space Mono', monospace;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    margin: 0;
+    padding: 0;
+  }
+  
+  #root {
+    min-height: 100vh;
+    background-color: hsl(var(--background));
   }
 }
 
 @layer components {
   .retro-card {
-    @apply bg-card border border-border p-6;
+    @apply border p-6;
+    background-color: hsl(var(--card));
+    border-color: hsl(var(--border));
     position: relative;
   }
 
@@ -111,16 +118,17 @@
   }
 
   .terminal-text {
-    @apply font-mono text-foreground;
+    @apply font-mono;
+    color: hsl(var(--foreground));
   }
 
   .terminal-prompt {
-    @apply text-muted-foreground;
+    color: hsl(var(--muted-foreground));
   }
 
   .terminal-prompt::before {
     content: '> ';
-    @apply text-primary;
+    color: hsl(var(--primary));
   }
 
   .noise-overlay {
@@ -140,7 +148,8 @@
   }
 
   .border-dashed-subtle {
-    @apply border-dashed border-border/50;
+    @apply border-dashed;
+    border-color: hsl(var(--border) / 0.5);
   }
 
   .scrollbar-thin {
