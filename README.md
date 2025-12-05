@@ -1,6 +1,6 @@
 # MeshOffice — Cursor-first, Convex-backed Work OS
 
-**Short pitch (one line):** MeshOffice (MO) is an AI-run work operating system focused on *AI-orchestrated pods for scoped deliverables* — a Cursor-built frontend with Convex powering backend state and serverless functions. MO turns plain-English requests like “I need a product feature built in 2 weeks on $X” into an immutable work-graph, automatically assembles a pod, assigns tasks, routes work, validates deliverables, logs IP and audit trails, and exposes an enterprise-ready dashboard for procurement and HR.
+MeshOffice (MO) is an AI-run work operating system focused on *AI-orchestrated pods for scoped deliverables* — a Cursor-built frontend with Convex powering backend state and serverless functions. MO turns plain-English requests like “I need a product feature built in 2 weeks on $X” into an immutable work-graph, automatically assembles a pod, assigns tasks, routes work, validates deliverables, logs IP and audit trails, and exposes an enterprise-ready dashboard for procurement and HR.
 
 ---
 
@@ -18,8 +18,6 @@ Key strategic differentiators we emphasize in this repo and README:
 ---
 
 ## TL;DR — What MeshOffice can do now (Repo state)
-
-> This README assumes the code-base in this repo is the Cursor-authored frontend + Convex functions. Status summary:
 
 * **Frontend (Cursor) — complete scaffold + production-ready pages**: UI components, routing, role-based views (requester / worker / hiring manager), WorkGraph dashboard, Pod management UI, and deliverable viewer are implemented and polished.
 * **Convex backend — schema + serverless functions**: data models for WorkGraph, Requests, Pods, Tasks, Candidates, Deliverables and audit logs exist. Core functions for CRUD and basic workflows are implemented.
@@ -227,11 +225,7 @@ We prefer small, reviewable PRs. If you're adding features to the MO Brain, add 
 
 ## License
 
-Pick a license appropriate to your goals (MIT for open-source community, Business Source License for hybrid commercial control, etc.).
-
----
-
-If you'd like, I can convert this document into a `README.md` file in the repo, or expand any technical section (Convex functions examples, real prompt examples, or a working `fn/runDecomposition` source snippet). What do you want next?
+License appropriate to your goals (MIT for open-source community, Business Source License for hybrid commercial control, etc.).
 
 ## Candidate discovery & profile model (intelligent)
 
