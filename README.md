@@ -1,204 +1,135 @@
-# 🌐 MeshOffice — AI-Native Work Orchestration OS  
-**Autonomous Workflows • AI-Managed Pods • Deep Talent Intelligence • Hiring & Execution in One Place**
+MeshOffice — Cursor-first, Convex-backed Work OS
 
-MeshOffice is an AI-native platform that replaces traditional job boards, freelancing sites, and project management tools with a **single intelligent operating system** that understands work, finds the right people, breaks work into tasks, and manages the entire execution autonomously.
+Short pitch (one line): MeshOffice (MO) is an AI-run work operating system focused on AI-orchestrated pods for scoped deliverables — a Cursor-built frontend with Convex powering backend state and serverless functions. MO turns plain-English requests like “I need a product feature built in 2 weeks on $X” into an immutable work-graph, automatically assembles a pod, assigns tasks, routes work, validates deliverables, logs IP and audit trails, and exposes an enterprise-ready dashboard for procurement and HR.
 
-It combines:
-- AI workflow orchestration  
-- Autonomous team assembly  
-- Talent intelligence  
-- Hiring automation  
-- Real-time project tracking  
-- A two-way marketplace for workers & employers  
-- A unified user profile system  
-- A dedicated LLM-powered backend (“MO Brain”)  
+Why MeshOffice — product positioning
 
-MeshOffice is built using **React, TypeScript, Vite, Tailwind, shadcn-ui**, and integrates with **Supabase** for database, auth, and backend functions.
+MeshOffice positions itself intentionally narrow: not a general freelancer marketplace. The strongest go-to-market wedge is AI-run pods for repeatable, specifiable deliverables (product engineering sprints, marketing campaign sprints, analytics research packets). By defining and selling discrete, verifiable "work units" and offering an LLM orchestration layer that owns quality SLAs, MO becomes a procurement-grade substitution for fragmented freelance buying + in-house orchestration.
 
----
+Key strategic differentiators:
+- Cursor-first frontend: handcrafted UI & UX coded using Cursor, not auto-generated blobs. Frontend maps directly to MO’s product model.
+- Convex backend: single source of truth for state, workflow, documents, and serverless business logic.
+- LLM orchestrator (MO Brain): autonomous reasoning layer for decomposition, routing, and validation.
+- Enterprise rails: audit logs, IP controls, NDAs, invoicing hooks.
 
-## 🚀 What is MeshOffice?
+TL;DR — What MeshOffice can do now (Repo state)
 
-MeshOffice is an **AI-first Work OS** that lets users say:
+Frontend (Cursor) — complete scaffold and polished production-ready UI for requester, worker, hiring manager views. Includes RequestComposer, WorkGraph dashboard, Pod management, deliverable viewer.
+Convex backend — schemas and serverless functions for workgraph state, requests, pods, tasks, candidates, deliverables, audit logs.
+MO Brain (LLM) — integration with prompt schemas ready; full logic stubs for decomposition and routing.
+End-to-end MVP: create a request → decompose → match candidates → create workgraph. Autonomous full-cycle execution wired but dependent on external LLM and payments.
 
-> “MO, I need this done in X time with Y budget.”
+Key concepts & Data model
 
-And MO automatically:
-1. Understands the request  
-2. Breaks it into tasks  
-3. Assembles the right team (freelancers or full-time candidates)  
-4. Assigns work  
-5. Tracks progress  
-6. Validates deliverables  
-7. Sends the user only the final output  
+WorkGraph: versioned, immutable graph of work units.
+Request: initial user ask with constraints.
+WorkPackage: LLM-generated unit with acceptance criteria and dependencies.
+Pod: group of assigned workers and tasks.
+Task: smallest assignable unit.
+CandidateProfile: structured & unstructured skill data, embeddings, historical scores.
+Deliverable: submitted artifact with metadata and validation result.
+AuditLog: immutable activity trail.
 
-On the other side, workers can join pods, get tasks assigned by AI, and get paid once their work is validated.
+Architecture — Cursor frontend + Convex backend
 
----
+Frontend (Cursor, React, TS):
+- Componentized UI: RequestComposer, WorkGraphViewer, PodBuilder, CandidateExplorer, DeliverableValidator.
+- Realtime Convex subscriptions.
 
-## 🧠 Core Features
+Backend (Convex):
+- Business logic functions:
+  - createRequest
+  - runDecomposition
+  - matchCandidates
+  - assignTasks
+  - validateDeliverable
+- Authentication, access control, realtime state.
 
-### **1. Natural-Language Workflows**
-Users describe work like texting a human.  
-MO interprets, plans, decomposes, and executes.
+MO Brain (LLM service):
+- External LLM API adapter
+- Structured JSON protocols for WorkPackage[]
+- Deterministic planning mode
 
-### **2. AI-Assembled Pods (Teams)**
-MO selects talent based on:
-- skills  
-- experience  
-- pricing  
-- availability  
-- embeddings  
-- performance history  
+Optional integrations:
+- Payments (Stripe)
+- Audit export
+- Git repo storage for engineering deliverables
 
-### **3. Automatic Task Decomposition**
-Large projects → structured task graph  
-Tasks → milestones → dependencies → owners
+Developer quickstart (local)
 
-### **4. Autonomous Work Execution**
-MO manages the entire lifecycle:
-- task assignment  
-- deadline tracking  
-- progress monitoring  
-- resolving blockers  
-- quality control  
+Clone repo, install deps, run dev environment.
+Set Convex URL/keys and LLM key in .env.local.
+Run Convex dev server.
+Seed demo data.
+Visit local dev host.
 
-### **5. Real-Time WorkGraph Dashboard**
-Visual tracking of:
-- budget  
-- timeline  
-- task progress  
-- risks & blockers  
-- candidate contributions  
+Example end-to-end flow
 
-### **6. Two-Way Marketplace**
-One unified profile allows users to:
-- **hire**  
-- **work**  
-- **switch roles dynamically**  
+User creates request.
+Convex saves and triggers decomposition.
+LLM returns WorkPackages.
+Convex persists tasks, runs matching.
+Pod is assembled.
+Frontend shows graph and assignments.
+Deliverables validated via LLM + optional human QA.
+Invoice-ready events emitted.
 
-### **7. Deep Candidate Intelligence**
-MO builds an internal capability graph by analyzing:
-- resumes  
-- informal conversational inputs  
-- previous work  
-- pricing patterns  
-- behavioral signals  
+Candidate discovery model
 
-### **8. AI Hiring Assistant**
-For full-time roles, MO handles:
-- job description generation  
-- candidate discovery  
-- screening & ranking  
-- shortlisting  
-- interview question generation  
+Candidate data includes resume + informal experience box.
+Semantic embeddings drive matching.
+Scoring formula considers skill fit, recency, ratings, availability, price.
+System learns from successful pods.
 
-### **9. End-to-End Freelance Workflow Automation**
-MO handles:
-- contracts  
-- task breakdown  
-- deliverable validation  
-- only leaving **payment approval** to the user
+LLM contract example
 
-### **10. MO Brain — Dedicated LLM Backend**
-Custom chain-of-thought architecture powers:
-- work planning  
-- talent matching  
-- candidate embeddings  
-- multi-step reasoning  
-- decision making  
+WorkPackage schema includes: id, title, description, acceptanceCriteria, estimatedHours, requiredSkills, dependencies, deliverables metadata, confidence.
+Strict JSON required.
+Retries and human fallback on invalid JSON.
 
----
+Security & enterprise controls
 
-## 🏗 Tech Stack
+NDAs and IP assignment metadata.
+Full audit logs with actor identity and fingerprints.
+Secrets only in Convex serverless env.
+Role-based access enforcement.
 
-### **Frontend**
-- Vite  
-- React  
-- TypeScript  
-- Tailwind CSS  
-- shadcn/ui  
-- Lucide Icons  
+Payment & SLA engine notes
 
-### **Backend**
-- Supabase (Postgres, Auth, Storage)  
-- Custom Node/Express API  
-- OpenAI / Claude LLMs  
-- Task engines & matchers  
+Stripe invoicing function recommended.
+SLA drift monitors via scheduled Convex functions.
 
----
+File structure (Cursor-first)
 
-## 📦 Project Setup
+web/ — frontend (components, pages, lib, styles)
+convex/ — functions + schemas
+scripts/ — seeding + migrations
+README.md
 
-Clone and install:
+Applications
 
-```bash
-git clone <YOUR_GIT_URL>
-cd meshoffice
-npm i
-npm run dev
-```
+Product engineering pods (features, APIs).
+Marketing pods (campaign bundles).
+Analytics pods (reports, dashboards).
+Hiring-as-software (candidate matching and ranking).
 
-Runs at:
-```
-http://localhost:5173
-```
+Operational notes
 
----
+Start with meta-layer on top of existing talent networks.
+Use Convex for real-time small to medium scale.
+Future migration of embeddings to vector DB and logs to data lake.
 
-## 🌐 Deploying & Domains
+Roadmap
 
-You can deploy directly from **Lovable**:  
-→ Project → Share → Publish
+Harden LLM validation loops.
+Add payments + SLA engine.
+Talent sourcing integrations.
+Enterprise procurement dashboards and analytics.
 
-For custom domains:  
-→ Settings → Domains → Connect
+Contributing
 
----
+Prefer small PRs. Add fixtures/tests for MO Brain JSON responses.
 
-## 🧩 Current Supabase Schema
+License
 
-MeshOffice uses 10 core tables:
-
-- `users`  
-- `requests`  
-- `pods`  
-- `tasks`  
-- `task_assignments`  
-- `deliverables`  
-- `candidates`  
-- `candidate_profiles`  
-- `candidate_matches`  
-- `jd_profiles`  
-
-These power the entire WorkGraph and candidate intelligence engine.
-
----
-
-## 🎯 Mission
-
-To replace outdated job boards, rigid corporate workflows, and chaotic freelancer marketplaces with a **single AI that understands work and executes it end-to-end**.
-
-MeshOffice is the first step toward an AI-native labor operating system.
-
----
-
-## 🛠 Status
-MVP in development.  
-Core backend logic and Supabase schema operational.  
-Frontend scaffolding active through React + Lovable.  
-
----
-
-## 🤝 Contributing
-Open to collaborators, engineers, and AI researchers.  
-Fork the repo → open PRs → build the future of work.
-
----
-
-## 📬 Contact
-For collaboration or access:
-**contact: (your email/link here)**
-
----
-
+Choose MIT or Business Source License depending on strategy.
